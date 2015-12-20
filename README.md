@@ -1,6 +1,6 @@
 # thesis_coppetec_template
-Template para escrita de dissertação ou tese nos padrões exigidos pela pós graduação da COPPE - PESC - UFRJ
-
+Template em latex para escrita de dissertação ou tese nos padrões exigidos pela pós graduação da COPPE - PESC - UFRJ
+Caso você queira utilizar word em conjunto com o software Mendeley, você pode, basta ir ao repositório: [https://github.com/fvdmagalhaes/citacao-coppe]
 ###Introduction
 
 This project provides a LaTeX document class suitable for writing academic
