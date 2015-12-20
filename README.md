@@ -2,7 +2,6 @@
 Template para escrita de dissertação ou tese nos padrões exigidos pela pós graduação da COPPE - PESC - UFRJ
 
 ###Introduction
-###------------
 
 This project provides a LaTeX document class suitable for writing academic
 dissertations and thesis according to the formatting rules established by the
@@ -20,14 +19,12 @@ standards of other institutions.
 
 
 ###When Conceived
-###--------------
 
 It was conceived in January 2007, during the D.Sc. studies of Vicente Helano
 and George Ainsworth at Federal University of Rio de Janeiro/COPPE.
 
 
 ###How Much
-###--------
 
 ``This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License version 3 as
@@ -35,7 +32,6 @@ published by the Free Software Foundation.''
 
 
 ###Archive Content
-###---------------
 
 The development of this class follows the Comprehensive TeX Archive
 Network (CTAN) standards, so it distributes a '.ins' file, '.dtx', and
@@ -85,7 +81,6 @@ A release package should contains only the following files:
 
 
 ###Installing
-###----------
 
 If you have some experience with LaTeX classes and packages, you won't have any
 difficult when installing CoppeTeX. It should be installed as any other LaTeX
@@ -122,7 +117,6 @@ section.
 
 
 ###Help & Support
-###--------------
 
 Please, send any comments, suggestions, questions and bugs to our mailing list
 <http://coppetex.sourceforge.net/mailing-list.html>.
