@@ -1,0 +1,351 @@
+\chapter{Fundamentação Teórica}
+\label{cap:fundamentacao}
+
+\section{Sistemas de Recomendação}
+Sistemas de Recomendação (SR) surgiram como uma área de pesquisa independente em meados da década de 90, quando foram desenvolvidos os primeiros sistemas de filtragem baseados nas preferências dos usuários como o \textit{Tapestry} \citep{Goldberg:1992:UCF:138859.138867}, o \textit{Ringo} \citep{Shardanand:1995:SIF:223904.223931} e o \textit{GroupLens} \citep{Resnick:1994:GOA:192844.192905}. Até este momento, o problema de recomendação era considerado como um caso específico de filtragem de informação e, portanto, era tratado dentro da área de Recuperação de Informação (RI) \citep{Baeza-Yates:1999:MIR:553876}. A partir de então, a área devotada a SR cresceu de maneira considerável, devido a enorme aplicabilidade que esses sistemas possuem no cenário econômico atual.
+
+Um dos trabalhos mais completos desta área, \citep{Adomavicius:2005:TNG:1070611.1070751} define SR através de uma função de utilidade $u(i,j)$ que exprime a importância, ou o valor, que o item $j$ possui para o usuário $i$. As avaliações dos usuários são consideradas observações da função de utilidade no espaço de usuários e itens. Assim, cabe ao SR tentar estimar artificialmente $u$ para os pontos do espaço onde não há observação. 
+
+Em termos formais, seja $U$ o conjunto de todos os usuários do sistema e $I$ o conjunto de todos os itens do sistema. Em aplicações atuais de \textit{e-commerce}, ambos podem chegar facilmente a ordem de milhões elementos. A função de utilidade a ser estimada é tal que $u: U \times I \rightarrow \mathbb{N}$ ou $u: U \times I \rightarrow \mathbb{R}$, dependendo do tipo de avaliação dada pelos usuários. Desta forma, um SR visa encontrar, para cada usuário $i$, o item $j'$ tal que: 
+
+\begin{equation}
+\forall i \in U, \quad j' = \argmax_{j \in I} u(i,j) 
+\end{equation}
+
+Uma vez encontrado o item, ou conjunto de itens, que maximiza a função de utilidade para um determinado usuário, o SR pode então recomendá-lo ao usuário, na esperança de que o mesmo o adquira. Ou seja, no caso de um \textit{e-commerce}, o sistema procura os itens que maximizam a probabilidade do usuário efetuar a compra.
+
+O espaço de usuário e itens $U \times I$ é, na prática, representado por uma matriz conhecida como matriz de preferências. Um exemplo de tal matriz pode ser visto na tabela \ref{tab:preferencias}, onde os usuários estão dispostos em linhas e os itens em colunas. Cada posição $r_{ij}$, dada pela interseção da linha $i$ com a coluna $j$, contem a preferência do usuário $i$ pelo item $j$ em forma de nota. Vale ressaltar que, quando o usuário não explicita sua preferência a respeito do item, a posição $r_{ij}$ da matriz fica em aberto, o que é representado pelo símbolo $\varnothing$. Como normalmente cada usuário avalia um subconjunto muito pequeno de itens, a grande maioria das posições na matriz de preferências são do tipo $\varnothing$. Portanto, dizemos que a matriz de preferências é uma matriz \textit{esparsa}.
+
+\begin{table}
+  \begin{tabular}{| c | c | c | c | c | c | c |}
+    \hline
+           & Titanic & Shrek & Guerra nas Estrelas & Forrest Gump & Batman & Pânico\\ \hline
+    David  & $\varnothing$ & 5 & 4 & 3 & $\varnothing$ & $\varnothing$\\ \hline
+    Julia  & 4 & 3 & $\varnothing$ & 4 & 1 & $\varnothing$\\ \hline
+    Matheus & $\varnothing$ & $\varnothing$ & 5 & $\varnothing$ & $\varnothing$ & 3\\ \hline
+    Aline & 5 & $\varnothing$ & $\varnothing$ & 2 & $\varnothing$ & 1\\
+    \hline
+  \end{tabular}
+  \caption{Matriz de Preferências}
+  \label{tab:preferencias}
+\end{table}
+
+Muitas técnicas de recomendação acabam por preencher as posições em aberto com zeros, o que, na prática, significa dizer que a grande maioria das avaliações são do tipo mais baixo possível. Obviamente, isto é uma suposição implausível e pode introduzir viés na estimativa da função de utilidade. Para lidar com este problema, algumas soluções procuram introduzir, ao invés de zero, a média das avaliações do usuário; a média das avaliações do item; ou a média global de todas as avaliações presentes na matriz. Todavia, as críticas a tais soluções se apoiam no fato de que as mesmas continuam por introduzir informação na matriz que pode não condizer com a real preferência dos usuários. Ou seja, todas tentativas de preencher as posições em aberto correm o risco de introduzir viés na estimativa de $u$.
+
+Uma abordagem alternativa é utilizar a matriz binária referente a matriz de preferência. Dada uma matriz de preferência $R$, a matriz binária $B$ da mesma é construída da seguinte forma: se a posição $r_{ij} \in R$ contem uma preferência, então a posição correspondente $b_{ij} \in B$ é igual a 1; caso contrário $b_{ij}$ é igual a zero. A matriz binária referente a matriz de preferências da tabela \ref{tab:preferencias} é apresentada na tabela \ref{tab:binaria}. Desta forma, na matriz binária, apesar de se perder a gradação das preferências, sabe-se que os valores ali presentes correspondem a um fato real, ou seja, ou o usuário avaliou ou ele não avaliou o item.
+
+\begin{table}
+  \begin{tabular}{| c | c | c | c | c | c | c |}
+    \hline
+           & Titanic & Shrek & Guerra nas Estrelas & Forrest Gump & Batman & Pânico\\ \hline
+    David  & 0 & 1 & 1 & 1 & 0 & 0\\ \hline
+    Julia  & 1 & 1 & 0 & 1 & 1 & 0\\ \hline
+    Matheus & 0 & 0 & 1 & 0 & 0 & 1\\ \hline
+    Aline & 1 & 0 & 0 & 1 & 0 & 1\\
+    \hline
+  \end{tabular}
+  \caption{Matriz Binária}
+  \label{tab:binaria}
+\end{table}
+
+Além disso, \citep{Adomavicius:2005:TNG:1070611.1070751} classifica as técnicas utilizadas nos SR em três abrangentes categorias: Baseadas em Conteúdo (BC), Filtragem Colaborativa (FC) e Híbridas. Nas próximas seções, exploraremos em detalhes tais categorias, expondo as ideias por trás de cada uma delas e indicando as técnicas mais famosas em cada caso.  
+
+\subsection{Baseadas em Conteúdo}
+Técnicas BC derivam da forte influência que a área de RI teve sobre SR, sendo considerada por muitos como sua progenitora. Tais técnicas entendem que o resultado de $u(i,j)$ retrata a \textit{compatibilidade} entre o usuário $i$ e o item $j$ e, portanto, para estimar corretamente a função $u$ é preciso compreender como se dá tal compatibilidade.
+
+Primeiramente, tais técnicas precisam criar um \textit{perfil} para cada usuário e item. De posse de tais perfis, analisa-se o nível de compatibilidade entre um usuário e um item através da compatibilidade entre seus perfis, o que significa em termos formais: 
+
+\begin{equation}
+u(i,j) = u(perfil(i),perfil(j))
+\end{equation}
+
+É interessante notar que este processo é extremamente intuitivo e que, muito provavelmente, o leitor já o pôs em prática de maneira inconsciente. Ao comprar um presente para alguém, é natural que o comprador tenha em mente um perfil do presentado e, ao analisar as opções de presente, o comprador está analisando se o perfil do presenteado é compatível com o perfil do item. Por exemplo, ao procurar um presente para uma pessoa jovem, busca-se itens com perfil jovial (e.g., artigos de aspecto moderno e informais). No caso de se presentear uma pessoa idosa, o perfil dos itens a serem considerados muda drasticamente (e.g., artigos considerados clássicos e formais). 
+
+Todos sabemos disso e colocamos isso em prática em nosso dia-a-dia, porém a medida de compatibilidade entre os perfis é feita de maneira subjetiva e até mesmo tácita, sendo difícil explicar como este processo é executado. Todavia, é esta maneira de se analisar a compatibilidade de perfis que as técnicas BC almejam aprender.   
+
+A criação de perfis, por si só, já é um desafio a parte, especialmente quando os itens são arquivos multimídia (e.g., imagens, áudio, vídeo). No caso de itens textuais, como páginas \textit{Web}, a criação do perfil pode ser realizada através de métodos de representação vetorial de texto, como, por exemplo, Frequência de Termos, em inglês \textit{Term Frequency} (TF), ou Frequência de Termos/Inverso Frequência de Documentos, em inglês \textit{Term Frequency/Inverse Document Frequency} (TF-IDF) \citep{Baeza-Yates:1999:MIR:553876}, muito utilizados dentro da área de RI. O perfil do item será então um vetor de tamanho $n$, onde cada dimensão representa o valor do TF, ou do TF-IDF, aplicado a uma das $n$ palavras-chaves.
+
+Em contrapartida, o perfil do usuário pode ser definido através de um vetor, também de tamanho $n$, onde cada dimensão representa o interesse do usuário sobre cada uma das $n$ palavras-chaves. A compatibilidade entre os perfis pode ser definida como sendo o alinhamento entre esses dois vetores, dado pelo cosseno do ângulo entre os mesmos. Assim, se o cosseno for próximo de 1, significa que os vetores estão alinhados e na mesma direção, o que aponta para uma forte compatibilidade entre o usuário e o documento. Caso contrário, os vetores são ortogonais ou estão alinhados em direções opostas, o que representa uma baixa compatibilidade entre o usuário e o documento.
+
+\begin{equation}
+u(i,j) = \cos (perfil(i),perfil(j))
+\end{equation}
+
+Obviamente, o uso de tais vetores como perfis e da função cosseno como medida de compatibilidade foi apenas um exemplo de como poderíamos implementar um SR baseado em conteúdo. Outros métodos de representação vetorial e outras heurísticas de compatibilidade poderiam ser empregadas. No entanto, este exemplo já é suficiente para percebermos as deficiências das técnicas BC. 
+
+Primeiramente, como já foi apontado, extrair um perfil (em forma de vetor) de itens multimídia não é uma tarefa trivial. Normalmente a extração é realizada sobre os metadados desses itens, porém, em caso de haver poucos metadados ou nenhum, é praticamente inviável criar um perfil para o item, o que restringe as técnicas BC para trabalharem apenas com itens textuais. 
+
+Mais ainda, tais técnicas são incapazes de distinguir a qualidade dos itens. Ou seja, se há dois documentos sobre um determinado tema, um deles considerado bom e outro ruim, eles terão o mesmo valor de compatibilidade para o usuário interessado naquele tema, desde que usem as mesmas palavras-chaves. Por fim, as recomendações dadas por técnicas BC acabam ficando confinadas aos temas ou palavras-chaves sobre os quais os usuários demonstraram interesse explícito, tolhendo a capacidade do sistema surpreender o usuário com uma recomendação inusitada que foge à sua área de interesse pré-definida.
+
+\subsection{Filtragem Colaborativa}
+Técnicas FC foram desenvolvidas com o propósito de superar as deficiências das técnicas BC. A ideia que molda FC é utilizar as observações da função $u$ para estimá-la, ao invés de recorrer aos perfis de usuários e itens, que podem ser criados de maneira enganosa, acarretando em estimativas enviesadas de $u$. Em outras palavras, a fim de se calcular a estimativa da preferência de um usuário sobre um item, $\hat{u}(i,j)$, técnicas de FC recorrem às preferências que os demais usuários forneceram explicitamente ao sistema, i.e., posições preenchidas da matriz de preferências. Tais técnicas podem ser divididas em duas subcategorias: FC baseada em Memória e FC baseada em Modelo.
+
+\subsection{FC baseada em Memória}
+Técnicas baseadas em Memória calculam a estimativa $\hat{u}(i,j)$ agregando as avaliações de $j$ que foram fornecidas por usuários similares a $i$. Primeiramente, é preciso definir uma medida de \textit{similaridade} entre usuários $sim(i,k)$, que pode ter várias formas, mas, essencialmente, todas visam mensurar o quão distante o usuário $i$ está do usuário $k$. Entretanto, para se calcular \textit{distância} entre dois elementos quaisquer, é necessário que ambos estejam mapeados em um espaço.
+
+A representação dos usuários em um espaço vetorial, pode ser obtida tomando a linha da matriz de preferência, ou da matriz binária, correspondente a cada usuário. Caso o número de itens da matriz seja elevado, esta representação se dará em um espaço vetorial demasiadamente esparso, o que pode dificultar o cálculo de $sim(i,k)$. Desta forma, para fins de simplicidade, pode-se limitar a representação vetorial de $i$ e $k$ à interseção dos itens que ambos avaliaram. 
+
+A partir de então, basta escolher uma, dentre as diversas medidas de distância existentes na literatura, e usá-la como sendo a medida de similaridade entre os usuários. Entre as possíveis opções para $sim(i,k)$ estão a função cosseno, a correlação de Pearson, a distância Euclidiana, a distância Manhattan, entre outras.
+
+De posse da similaridade entre os usuários, a estimativa $\hat{u}(i,j)$ é calculada através de uma \textit{agregação} das preferências a respeito do item $j$, fornecidas explicitamente pelos $N$ usuários mais similares a $i$. Seja $C$ o conjunto que contem os $N$ usuários mais similares a $i$ e $\overline{u}(i)$ a média simples de todas as avaliações fornecidas pelo usuário $i$. Assim, podemos citar, como exemplos de agregação, as equações \ref{eq:exemplo-agregacao-1} e \ref{eq:exemplo-agregacao-2}.   
+
+\begin{equation}
+\hat{u}(i,j) = \frac{1}{N} \sum_{k \in C} sim(i,k) \times u(k,j) \\ 
+\label{eq:exemplo-agregacao-1}
+\end{equation}
+
+\begin{equation}
+\hat{u}(i,j) = \overline{u}(i) + \frac{1}{N} \sum_{k \in C} sim(i,k) \times [u(k,j) - \overline{u}(k)]
+\label{eq:exemplo-agregacao-2}
+\end{equation}
+
+\subsection{FC baseada em Modelo}
+Diferentemente das técnicas baseadas em Memória, as baseadas em Modelo procuram modelar matematicamente o comportamento do usuário através de \textit{modelos} treinados com observações da função $u$. O termo \textit{modelo} faz referência aos métodos de Aprendizado de Máquina (AM), todavia, como as observação de $u$ estão no formato matricial (matriz de preferências), não é possível aplicar tais métodos diretamente \citep{braida:2013}.
+
+Problemas de aprendizado supervisionado requerem um conjunto de dados devidamente rotulados no formato $ \langle x,y \rangle$, onde $x$ é uma instância em $\mathbb{R}^n$ e $y$ sua respectiva classe ou valor associado. O fato de que, em problemas de recomendação, os dados estão dispostos em formato matricial impede que tais problemas sejam encarados como problemas tradicionais de aprendizado supervisionado.
+
+Portanto, alguns modelos foram desenvolvidos para atuarem especificamente sobre a matriz de preferência, já que transformar os dados do formato matricial para o formato tradicional de aprendizado supervisionado não é uma tarefa trivial \citep{braida:2013}. A enorme maioria desses modelos se baseia na decomposição da matriz de preferências. Em particular, uma decomposição ganhou grande notoriedade na literatura de SR devido a sua aplicabilidade e praticidade, a Decomposição em Valores Singulares. 
+
+\subsection{Decomposição em Valores Singulares}
+\label{sec:svd}
+A Decomposição em Valores Singulares, em inglês \textit{Singular Value Decomposition} (SVD), se destacou dentro da literatura de SR, pois é uma maneira de se criar espaços vetoriais, de tamanho arbitrário, onde usuários e itens podem ser mapeados. A fim de apresentarmos esta decomposição em maiores detalhes, se faz necessário definir alguns conceitos importantes de álgebra linear.
+
+Suponha que a matriz de preferências $R$ seja quadrada ($R_{n \times n}$) e positiva. Neste caso, é possível decompor $R$ utilizando os seus $n$ autovalores e autovetores, $\lambda_i$ e $x_i$, respectivamente. Tal decomposição é expressa através da equação \ref{eq:eigen-decomp} e, ao longo deste trabalho, iremos nos referir a mesma como \textit{Decomposição em Autovalores}. 
+
+\begin{equation}
+R = Q \Lambda Q^{-1}
+\label{eq:eigen-decomp}
+\end{equation}
+
+A matriz $Q$ contem os $n$ autovetores de $R$ em suas colunas e a matriz $\Lambda$ contem os $n$ autovalores de $R$ em sua diagonal. Além disso, se $R$ for simétrica, o que é pouco provável para uma matriz de preferências, sua matriz de autovetores $Q$ apresenta uma interessante propriedade: ela é ortogonal, isto é, $Q^{-1}=Q^{T}$ \citep{strang09}. 
+
+\begin{align*}
+&Q = \begin{pmatrix} x_1 & x_2 & \cdots & x_n \end{pmatrix} \\
+&\Lambda =
+ \begin{pmatrix}
+  \lambda_1 &          &        & \\
+           & \lambda_2 &        & \\
+           &          & \ddots & \\
+           &          &        & \lambda_n
+ \end{pmatrix}
+\end{align*}
+
+A Decomposição em Autovalores possui implicações muito importantes, principalmente nas abordagens numéricas a problemas envolvendo matrizes de dimensões elevadas. Por exemplo, suponha que é preciso calcular $R^{100}$. A primeira vista, o leitor pode até considerar efetuar sucessivas multiplicações de matrizes, porém, caso $R$ possua dimensões elevadas, esta já não seria mais uma opção viável. No entanto, se fizermos uso do resultado apresentado na equação \ref{eq:eigen-decomp}, temos:
+
+\begin{align*}
+R^{100} &= Q \Lambda \underbrace{Q^{-1} \times Q}_{I} \Lambda \underbrace{Q^{-1} \times \ldots Q}_{\Lambda^{97}} \Lambda Q^{-1} \\
+R^{100} &= Q \Lambda^{100} Q^{-1}
+\end{align*}
+
+Ou seja, com este resultado podemos substituir uma série de operações de multiplicação de matrizes (extremamente custosas) pela simples operação de potenciação da matriz $\Lambda$, que, por sua vez, se resume a potenciação dos valores em sua diagonal.
+
+Contudo, é muito difícil que $R$ seja quadrada em situações reais. Consideremos então $R$ como sendo uma matriz retangular $m \times n$ de \textit{rank} igual $k$, isto é, $R$ possui $k$ linhas e colunas linearmente independentes. Desejamos encontrar duas matrizes ortogonais $U$ e $V$, que sejam bases para o espaço de linhas (\textit{row space}) e de colunas (\textit{column space}) de $R$, respectivamente. Mais ainda, desejamos que para cada vetor $v_i \in V$ e $u_i \in U$ a relação expressa pela equação \ref{eq:svd-decomp} se mantenha.
+
+\begin{equation}
+R \underbrace{\begin{pmatrix} v_1 & v_2 & \cdots & v_k \end{pmatrix}}_{V} = \underbrace{\begin{pmatrix} u_1 & u_2 & \cdots & u_k \end{pmatrix}}_{U} \underbrace{\begin{pmatrix}
+  \sigma_1 &          &        & \\
+           & \sigma_2 &        & \\
+           &          & \ddots & \\
+           &          &        & \sigma_k
+ \end{pmatrix}}_{\Sigma} 
+\label{eq:svd-decomp}
+\end{equation}
+
+Como $U$ e $V$ são ortogonais, suas inversas são iguais às suas transpostas. Assim, podemos multiplicar ambos os lados por $V^{T}$, o que resultará na equação \ref{eq:svd-full-decomp}.
+
+\begin{equation}
+R = U \Sigma V^{T}
+\label{eq:svd-full-decomp}
+\end{equation}
+
+Os vetores $v_i$ e $u_i$ são chamados de \textit{vetores singulares} enquanto que os escalares $\sigma_i$ são chamados de \textit{valores singulares}. Note que a relação apresentada na equação \ref{eq:svd-full-decomp} lembra muito a relação da equação \ref{eq:eigen-decomp}, porém a primeira é ainda mais genérica que a segunda, uma vez que $R$ pode ter quaisquer dimensões. Nos resta ainda descobrir possíveis candidatos para $V$ e $U$. Se utilizamos a expressão dada pela equação \ref{eq:svd-full-decomp} para escrever $RR^{T}$ e $R^{T}R$, temos: 
+
+\begin{align*}
+RR^{T} &= U \Sigma V^{T}(U \Sigma V^{T})^{T} =  U \Sigma V^{T} V \Sigma^{T} U^{T} = U \Sigma \Sigma^{T} U^{T} = U \Sigma^2 U^{T} \\
+R^{T}R &= (U \Sigma V^{T})^{T} U \Sigma V^{T} = V \Sigma^{T} U^{T} U \Sigma V^{T} = V \Sigma^{T} \Sigma V^{T} = V \Sigma^2 V^{T}
+\end{align*}
+
+Ou seja, a matriz $U$ nada mais é do que a matriz dos autovetores de $RR^{T}$, enquanto que a matriz $V$ é a matriz dos autovetores de $R^{T}R$. Tanto $RR^{T}$ quanto $R^{T}R$ serão sempre positivas e simétricas, o que implica que sua Decomposição em Autovalores resultará em matrizes de autovetores ortogonais. Logo, temos a garantia de que tanto $V$ quanto $U$ serão sempre ortogonais. É interessante notar também $RR^{T}$ e $R^{T}R$ possuem os mesmos autovalores, o que nos garante que os valores singulares serão sempre a raiz quadrada de tais autovalores, em ambos os casos.
+
+Em termos práticos, dada a matriz de preferências $R_{m \times n}$, com $m$ usuários e $n$ itens, a Decomposição em Valores Singulares retornará três matrizes: $U_{m \times k}$, $\Sigma_{k \times k}$ e $V_{n \times k}$. Apesar de termos utilizado o parâmetro $k$ como sendo o \textit{rank} de $R$, na realidade o \textit{rank} é simplesmente um limite superior para $k$. Normalmente a matriz $\Sigma$ possui os valores singulares dispostos em ordem decrescente em sua diagonal, deste modo pode-se verificar quais são os $k$ ($k < rank$) valores singulares mais significativos e descartar os demais, reduzindo assim as dimensões de $U$ e $V$. 
+
+As matrizes $U$ e $V$ possuem a representação dos usuários e itens em $\mathbb{R}^k$, respectivamente. As dimensões de tal espaço são ditas dimensões \textit{latentes}, pois não é possível determinar uma interpretação definitiva para cada uma, pelo contrário, várias interpretações são cabíveis \citep{Dumais:LSA:2004}. Esta é, sem dúvida, a grande vantagem da decomposição SVD, já que representar um usuário ou item no formato vetorial era algo considerado complexo devido a estrutura de dados utilizada (matriz de preferências). As opções que haviam eram representações em vetores esparsos com uma dimensão para cada usuário ou item. Contudo, agora é possível representá-los em vetores o quão pequenos quanto se queira, o que abre caminhos para diversos tipos de análises no espaço latente. Por exemplo, é possível \textit{clusterizar} usuários/itens neste espaço; calcular a similaridade entre os mesmos usando alguma noção de distância entre suas representações latentes; e, obviamente, este tipo de representação potencializa a construção de modelos genéricos, uma vez que os valores presentes na representação vetorial não estão mais associados a grandezas físicas ou conceituais. 
+
+\subsubsection{\textit{Regularized SVD}}
+\label{sec:regularized-svd}
+A técnica \textit{Regularized SVD} talvez seja a mais famosa dentre as que se utilizam da decomposição SVD. Proposta em \citep{Funk:2006:Online}, esta técnica chamou a atenção pelo bom desempenho obtido na competição do \textit{Netflix}, além de mostrar simplicidade e elegância. Apesar de ter sido proposta durante a competição, o nome \textit{Regularized SVD} só foi cunhado algum tempo mais tarde por \citep{paterek_2007}.
+
+O \textit{Regularized SVD} utiliza a decomposição SVD para encontrar uma representação vetorial inicial de usuários e itens em $k$ dimensões latentes. Seja $user_i$ o vetor de tamanho $k$ que representa o usuário $i$, e $item_j$ o vetor que representa o item $j$ também com tamanho $k$. Como a competição organizada pelo \textit{Netflix} era voltada para recomendação de filmes, mais especificamente os filmes do próprio \textit{Netflix}, \citep{Funk:2006:Online} comenta que as $k$ dimensões latentes poderiam corresponder a $k$ gêneros cinematográficos e, portanto, o valor em cada dimensão aponta para a intensidade com que aquele gênero está associado ao filme. Por exemplo, se $k=5$, poderíamos considerar que essas cinco dimensões correspondem aos gêneros ação, romance, comédia, suspense e terror. Obviamente, na prática, não é possível saber quais são exatamente os gêneros representados, mas a analogia nos ajudar a entender melhor a dinâmica do algoritmo.
+
+Por outro lado, no caso da representação vetorial de usuários, as $k$ dimensões representariam a inclinação, ou gosto, que o usuário possui pelo respectivo gênero. Aproveitando o exemplo anterior onde $k=5$, poderíamos considerar estas cinco dimensões como sendo gosto por ação, gosto por romance, gosto por comédia, gosto por suspense e gosto por terror. Desta forma, assume-se que a previsão da preferência será dada pelo produto escalar dos vetores que representam o usuário e o filme, conforme mostra a equação \ref{eq:prediction-reg}. Ou seja, se o usuário gosta muito de filmes de ação e o filme em questão possui uma componente de ação elevada, o produto desses fatores contribuirá para aumentar o valor da previsão. No caso oposto, se o usuário detesta filmes de terror e o filme em questão possui uma componente elevada de terror, então o produto desses fatores contribuirá para a redução do valor da previsão.
+
+\begin{equation}
+\hat{u}(i,j) = user_{i}^{T}item_{j}
+\label{eq:prediction-reg}
+\end{equation}
+
+Durante a competição, as técnicas propostas foram avaliadas e ranqueadas de acordo com a Raiz do Erro Médio Quadrático, ou, em inglês, \textit{Root Mean Square Error} (RMSE). Esta métrica calcula o Erro Quadrático (EQ) para todas a previsões feitas, toma seu valor médio e depois extrai sua raiz quadrada. Como o EQ é uma função quadrática, conforme nos mostra a equação \ref{eq:square-error}, há um ponto de mínimo que pode ser alcançado ``caminhando'' na direção do gradiente da função, método popularmente conhecido como \textit{Gradiente Descendente}. Portanto, \citep{Funk:2006:Online} decide retroalimentar suas estimativas $user_i$ e $item_j$, fornecidas primeiramente pela decomposição SVD, com o gradiente de EQ, descrito pelas equações \ref{eq:partial-dif-u} e \ref{eq:partial-dif-v}.
+
+\begin{equation}
+e_{ij} = \left( u(i,j) - \hat{u}(i,j) \right)^2 = \left( u(i,j) - user_{i}^{T}item_{j} \right)^2
+\label{eq:square-error}
+\end{equation}
+
+\begin{equation}
+\frac{\partial e_{ij}}{\partial user_i} = \left( u(i,j) - user_{i}^{T}item_{j} \right) item_j = e_{ij} item_j
+\label{eq:partial-dif-u}
+\end{equation}
+
+\begin{equation}
+\frac{\partial e_{ij}}{\partial item_j} = \left( u(i,j) - user_{i}^{T}item_{j} \right) user_i = e_{ij} user_i
+\label{eq:partial-dif-v}
+\end{equation}
+
+As constantes foram desconsideradas no cálculo das derivadas parciais, pois elas apenas quantificam a velocidade com que se ``caminha'' na direção do gradiente, também conhecida como taxa de aprendizado. Esta taxa será definida como $\rho$ e será um dos parâmetros do algoritmo, devendo ser ajustada de acordo com os dados.
+
+Uma vez que a retroalimentação com o gradiente procura levar as previsões $\hat{u}(i,j)$ o mais próximo possível das avaliações reais $u(i,j)$, presentes na matriz de preferência, isto pode gerar estimativas ruins de $user_i$ e $item_j$ para usuários e itens com poucas avaliações. Para evitar esta \textit{superespecialização} em casos onde há pouca informação sobre usuários e itens, \citep{Funk:2006:Online} insere o fator regularizador $\lambda$ na retroalimentação. Desta maneira, a retroalimentação de $user_i$ e $item_j$ se dá de acordo com as equações \ref{eq:retro-u} e \ref{eq:retro-v} e se repete até que um valor limite $\varepsilon$ de RMSE seja atingido.
+
+\begin{equation}
+user_i = user_i + \rho (e_{ij} item_j - \lambda user_i)
+\label{eq:retro-u}
+\end{equation}
+
+\begin{equation}
+item_j = item_j + \rho (e_{ij} user_i - \lambda item_j)
+\label{eq:retro-v}
+\end{equation}
+
+Em suma, o \textit{Regularized SVD} possui quatro parâmetros a se ajustar: a taxa de aprendizado $\rho$; o fator de regularização $\lambda$; o critério de parada $\varepsilon$; e o numero de dimensões latentes $k$ a serem extraídas da decomposição SVD. Segundo \citep{paterek_2007}, os valores que apresentaram melhor desempenho foram: $\rho=0,001$; $\lambda=0,02$; $\varepsilon=0,1$; e $k=96$.
+
+\subsubsection{\textit{Improved Regularized SVD}}
+\label{sec:improved-regularized-svd}
+Numa tentativa de se melhorar o \textit{Regularized SVD}, \citep{paterek_2007} propôs acrescentar à previsão o viés do usuário $bias_i$ e o viés do item $bias_j$, conforme mostrado na equação \ref{eq:prediction-imp}. Por seu carácter incremental, esta técnica foi batizada de \textit{Improved Regularized SVD}. 
+
+\begin{equation}
+\hat{u}(i,j) = bias_i + bias_j + user_{i}^{T}item_{j}
+\label{eq:prediction-imp}
+\end{equation}
+
+A retroalimentação de $user_i$ e $item_j$ se dá conforme as equações \ref{eq:retro-u} e \ref{eq:retro-v}, respectivamente. Entretanto, os novos parâmetros $bias_i$ e $bias_j$ também são recalculados a cada iteração, sendo sua retroalimentação dada pelas equações \ref{eq:retro-bi} e \ref{eq:retro-bj}, respectivamente, onde $\mu$ é a média global das avaliações contidas na matriz de preferências.
+
+\begin{equation}
+bias_i = bias_i + \rho (e_{ij} - \lambda (bias_i + bias_j - \mu))
+\label{eq:retro-bi}
+\end{equation}
+
+\begin{equation}
+bias_j = bias_j + \rho (e_{ij} - \lambda (bias_i + bias_j - \mu))
+\label{eq:retro-bj}
+\end{equation}
+
+\subsection{Híbridas}
+Técnicas híbridas, como o nome indica, procuram mesclar características das técnicas de FC e das BC. Segundo \citep{Adomavicius:2005:TNG:1070611.1070751}, há basicamente quatro maneira de se efetuar essa mesclagem: implementar técnicas de FC e BC de forma independente e combinar seus resultados; incorporar aspectos de conteúdo nas técnicas de FC; incorporar aspectos colaborativos nas técnicas BC; criar modelos que considerem tanto o aspecto colaborativo quanto o aspecto de conteúdo.
+
+Como exemplo da primeira maneira, \citep{Claypool99combiningcontent-based} calcula as recomendações finais através de uma média ponderada entre o resultado dado por uma técnica de FC e o resultado dado por uma técnica BC. A alocação dos pesos segue a dinâmica do sistema, isto é, se a proporção de avaliações aumenta (esparsidade da matriz de preferência diminui), é sinal que o lado colaborativo pode ser mais explorado e, portanto, o sistema atribui maior peso para o resultado da técnica de FC. Caso contrário, atribui-se peso maior ao resultado da técnica BC.
+
+Aspectos de conteúdo foram explorados em técnicas de FC, sobretudo na tentativa de se amenizar os efeitos da esparsidade na matriz de preferências. Não é raro se deparar com pares de usuários cuja interseção de itens avaliados é demasiadamente pequena, nesses casos o cálculo da similaridade usando as avaliações em comum pode ser enganoso. Portanto, diversos trabalhos, como \citep{Pazzani:1999:FCC:340120.340130} e \citep{Balabanovic:1997:FCC:245108.245124}, propõem calcular a similaridade com base nos perfis dos usuários. Além disso, \citep{Melville:2002:CCF:777092.777124} propôs utilizar a informação dos perfis para preencher a matriz de preferências, método que batizou de \textit{Filtragem Colaborativa impulsionada por Conteúdo}.
+
+O caso contrário, isto é, a incorporação de aspectos colaborativos em técnicas BC, já não é tão usual. Como exemplo desse tipo de abordagem, podemos citar \citep{Nicholas99combiningcontent} que faz uso do método conhecido como Indexação Semântica Latente, em inglês, \textit{Latent Semantic Indexing} (LSI) \citep{Berry:1999:USE:307681}, a fim de obter uma relação de similaridade entre os perfis dos usuários.
+
+Há diversas maneira de se implementar a última abordagem, que consiste em criar um modelo abrangendo tanto os aspectos colaborativos quanto os de conteúdo. Em particular, métodos de Aprendizado de Máquina (AM) foram extensamente explorados, pois permitem que as instâncias do conjunto de treinamento sejam descritas considerando diversos aspectos diferentes, entre os quais os colaborativos e de conteúdo. Como exemplo deste tipo de abordagem podemos citar \citep{ansari:2000}, \citep{Condliff99bayesianmixed-effects} e \citep{Popescul01probabilisticmodels}.
+
+\section{Aprendizado Ativo}
+\label{sec:aprendizado-ativo}
+Modelos de Aprendizado de Máquina (AM) buscam identificar padrões ``escondidos'' nos dados. Para isto, tais modelos são expostos a um conjunto limitado de dados, conhecido como \textit{conjunto de treinamento}, o qual é utilizado para refinar o modelo até que o mesmo seja capaz de identificar, com precisão, os padrões ali presentes. A esta etapa damos o nome de \textit{treinamento}.
+
+A fim de avaliarmos se a etapa de treinamento foi bem sucedida, o modelo é novamente utilizado, desta vez em um outro conjunto de dados, que não possui interseção com o primeiro, chamado de \textit{conjunto de teste}. Como o nome indica, o modelo é solicitado a prever as classes ou valores associados às instâncias desse conjunto e as previsões, por sua vez, são averiguadas junto às verdadeiras classes ou valores associados. A esta etapa damos o nome de \textit{teste} e, como resultado final, obtemos o valor de acurácia do modelo (numero de previsões corretas dividido pelo total de previsões feitas).
+
+É evidente que, se desejarmos obter o modelo mais acurado possível, o conjunto de treinamento deve ser o que melhor \textit{representa} a população dos dados, no entanto, em estatística, é difícil mensurar o quão bem uma amostra representa sua população. Em termos práticos, julga-se que quanto maior o tamanho da amostra mais representativa ela é. O mesmo ocorre com conjuntos de treinamento, normalmente procura-se treinar o modelo com o maior e mais diversificado conjunto possível. Porém, ao contrário de amostras, que são simplesmente coletadas ou extraídas, um conjunto de treinamento requer esforço maior para ser construído, pois, além da coleta ou extração das instância, é necessário \textit{rotular} cada uma delas.
+
+Um conjunto de treinamento típico possui o formato $\langle x,y \rangle$, onde $x$ é uma instância em $\mathbb{R}^n$ e $y$ sua respectiva classe - em problemas de classificação - ou valor associado - em problemas de regressão. Ao processo de associar classes ou valores a cada uma das instância damos o nome de \textit{rotulagem} e há determinados tipos de problemas onde tal processo pode ser muito custoso. 
+
+Por exemplo, no caso de classificação de notícias, é necessário que um rotulador humano leia cada uma das notícias e escolha a classe que melhor lhe convém (e.g., esporte, economia, política, cultura, etc.). Supondo que cada notícia tenha alguns parágrafos de extensão, o tempo de leitura e rotulagem de cada instância é considerável. Para se construir um conjunto de treinamento grande o suficiente, ou gasta-se muito contratando diversos rotuladores que realizarão a rotulagem em pouco tempo; ou contrata-se poucos rotuladores que demorão bastante tempo para terminal a rotulagem. Em ambos os casos há um alto custo envolvido, seja em relação a tempo ou em relação a dinheiro.
+
+Há casos ainda onde se necessita de rotuladores devidamente capacitados, o que acarreta em custos de contratação mais elevados. É o caso, por exemplo, da construção de conjuntos de treinamento para reconhecimento de voz. Cada discurso gravado deve ser destrinchado em fonemas e, para tal, é preciso ter linguistas como rotuladores. Além disso, mesmo com o auxílio de especialistas o processo de rotulagem em fonemas é, por natureza, complexo e pode demorar muito tempo para ser concluído.
+
+Aprendizado Ativo (AA) surgiu como uma área de pesquisa dentro de AM que busca otimizar a construção do conjunto de treinamento. Normalmente, a seleção das instância que serão rotuladas se dá de forma aleatória. Todavia, é plausível que haja uma maneira inteligente de se escolher as instâncias a serem rotuladas de forma que possamos construir um conjunto de treinamento mais eficaz, isto é, um conjunto onde o modelo poderá obter bons resultados de acurácia ainda que possuindo poucas instâncias rotuladas.
+
+As técnicas de AA, comumente chamadas de estratégias de AA, foram genericamente descritas e classificadas em \citep{settles.tr09}. Contudo, neste trabalho, optamos pela classificação realizada em \citep{RubensRecSysHB2010}, que aborda as estratégias especificamente sob o ponto de vista de SR. Os autores em \citep{RubensRecSysHB2010} analisam as estratégias por diversos ângulos e apontam os vários critérios que devem ser considerados ao se escolher uma estratégia para o SR. Mais ainda, \citep{RubensRecSysHB2010} classificam as estratégias de AA em duas abrangentes categorias que analisaremos nas próximas seções, são elas: Redução de Incerteza e Redução de Erro.
+
+\subsection{Redução de Incerteza}
+O conceito de \textit{incerteza} é extremamente importante para se entender AA como um todo. Há instâncias para quais é a rotulagem será fácil e há aquelas para as quais a rotulagem será difícil, ou melhor, duvidosa. A incerteza associada a uma instância mede o quão difícil, ou duvidoso, será rotular esta instância. Estratégias baseadas na redução da incerteza assumem que ao se rotular as instâncias com maior valor de incerteza, isto é, acrescentá-las no conjunto de treinamento, estamos reduzindo o erro do modelo que ali será treinado. 
+
+Obviamente, reduzir a incerteza sobre os dados não implica necessariamente em redução do erro do modelo. Se estivermos utilizando um modelo inadequado, ao reduzir a incerteza podemos simplesmente ficar mais certos sobre o modelo errado. Portanto, a medida que o conjunto de treinamento cresce, deve-se verificar se o modelo continua adequado, caso contrário, o simples emprego de tais estratégias acaba sendo enganoso e prejudica mais do que auxilia.
+
+A incerteza associada a cada instância, por sua vez, pode ser medida sob diversos aspectos, como, por exemplo, a incerteza que o modelo possui sobre a instância; a incerteza associada a região de decisão; a incerteza associada a posição da instância no espaço; entre outros. Analisaremos os principais aspectos apresentando como se dá o cálculo da incerteza em cada caso.
+
+\subsection{Incerteza do Modelo}
+Quando nos referimos à \textit{Incerteza do Modelo}, estamos afirmando que a incerteza associada a uma instância é medida pela incerteza que o modelo possui sobre esta instância. Este caso é bem nítido quando tratamos de modelos probabilísticos, isto é, modelos cujas previsões são dadas com base na probabilidade de uma instância pertencer a uma classe em detrimento das outras. Por exemplo, \citep{settles.tr09} apresenta um modelo probabilístico bem simples $\theta$, onde só há duas possíveis classes $y_1$ e $y_2$.
+
+\begin{equation}
+\theta(x) = \left\{ 
+  \begin{array}{l l}
+    y_1, & \quad \text{se $P(y_1|x) > P(y_2|x)$}\\
+    y_2, & \quad \text{se $P(y_2|x) > P(y_1|x)$}
+  \end{array} \right.
+\label{eq:simple-prob-model}
+\end{equation}
+
+Assim, uma estratégia baseada na incerteza do modelo selecionaria para rotulagem a instância $x'$ cujas probabilidades posteriores $P(y_i|x')$ fossem as mais próximas possíveis. Como o modelo é binário, se uma das probabilidades for alta, obrigatoriamente a outra será baixa, isto é sinal de que o modelo está certo sobre a respectiva classe da instância. Caso contrário, se ambas forem próximas de $\rfrac{1}{2}$, é sinal de que o modelo está em dúvida quanto a classe da instância e, portanto, esta instância possui alta incerteza. A formalização da estratégia pode ser encontrada na equação \ref{eq:strat-aa-simple}, onde $y' = \argmax_i P(y_i|x)$.
+
+\begin{equation}
+x' = \argmax_x 1 - P(y'|x)
+\label{eq:strat-aa-simple}
+\end{equation}
+
+Caso haja mais de duas classes, o que, na prática, é muito mais realista, há uma adaptação da estratégia anterior, conhecida como \textit{margem de amostragem}, que se baseia apenas na distância entre as duas maiores probabilidades posteriores. Sejam $y_1$ e $y_2$ as classes com maior probabilidade para a instância $x$, logo a instância de maior incerteza $x'$ é aquela cuja distância entre $P(y_1|x)$ e $P(y_2|x)$ é a menor.
+
+\begin{equation}
+x' = \argmin_x |P(y_1|x) - P(y_2|x)|
+\end{equation}
+
+Uma das críticas levantas por \citep{settles.tr09} a respeito da margem de amostragem é que ela desconsidera completamente a certeza (negativa) que o modelo possui quanto às outras classes. Por exemplo, no caso de três classes, se tivermos, para uma instância $x_a$, a probabilidade referentes às três classes muitos próximas, enquanto que, para outra instância $x_b$, há duas probabilidades altas que se sobressaem a terceira. Pela margem de amostragem, ambas possuirão o mesmo valor de incerteza, desde que a diferença entre as duas maiores probabilidades seja igual. Entretanto, a incerteza relacionada a $x_a$ deveria ser muito maior do que a relacionada a $x_b$, pois, no caso desta última, o modelo está certo de que a terceira classe não é adequada para a instância, certeza esta que não temos no primeiro caso.
+
+A fim de contornar este problema, \citep{settles.tr09} sugere o uso da entropia para se calcular a incerteza de uma instância. O conceito da entropia é muito utilizado na física e mede o quão ``agitado'' um sistema está. Esta agitação física, por sua vez, pode ser traduzida em termos probabilísticos como incerteza. Por exemplo, se um determinado sistema de partículas está estável, então a probabilidade de se encontrar uma partícula em um determinado local é mais alta do que nos demais locais. Uma vez que a agitação das partículas é baixa, ou seja, entropia é baixa, elas tendem a não se mover muito. Caso contrário, se a agitação das mesmas for alta, significa que a probabilidade de se encontrar a partícula em qualquer local do sistema é a mesma, dado que ela se move muito (a entropia é alta). Como a entropia consegue captar o quão equiprovável as previsões para uma instância são, ela é capaz de medir a incerteza da instância considerando todas as possíveis classes em que esta pode ser classificada.
+
+\begin{equation}
+x' = \argmax_x -\sum_{i=1}^{N} P(y_i|x) \log P(y_i|x)
+\end{equation}
+
+Existem ainda muitas outras maneiras de se calcular a incerteza de uma instância com base no modelo. Considerando trabalhos voltados para SR, \citep{Boutilier:2002:ACF:2100584.2100596}, por exemplo, calcula a incerteza associada a um item através do Valor Esperado da Informação Perfeita, em inglês, \textit{Expected Value of Perfect Information} (EVPI). Já \citep{Jin:2004:BAT:1036843.1036877} chega conclusão que, quando se trata de modelos probabilísticos latentes (e.g., \textit{Aspect Model}, \textit{Flexible Mixture Model}), utilizar a entropia como medida de incerteza pode não ser uma boa opção, pois pode acabar enviesando a estimativa do modelo. Desta forma, \citep{Jin:2004:BAT:1036843.1036877} propõe o uso do divergente Kullback–Leibler (ver seção \ref{sec:met-gen}) entre as probabilidades estimadas pelo modelo e as reais. Todavia, este trabalho assume que o usuário sempre será capaz de avaliar o item de maior incerteza, suposição que não é verdadeira para o problema de \textit{Elicitação de Preferências para fins de Arranque Frio}. Logo, \citep{Harpale:2008:PAL:1390334.1390352} adiciona ao divergente a probabilidade do usuário avaliar o item, que, em termos práticos, se resume a popularidade do mesmo.
+
+Todos esses trabalhos utilizaram modelo probabilísticos, porém é possível desenvolver estratégias baseadas na incerteza do modelo quando o mesmo não é probabilístico. Por exemplo, no caso de classificação por vizinhos mais próximos, a proporção de vizinhos de cada classe pode ser tomada como sendo a probabilidade da instância pertencer àquela classe. No caso de modelos que traçam funções discriminantes no espaço, a distância da instância para a fronteira criada pela função pode ser tomada como medida de incerteza. No caso de problemas de regressão, a variância da previsão pode ser utilizada como incerteza \citep{settles.tr09}, ou ainda pode-se supor que os maiores, ou menores valores, fornecidos pelo modelo são os de maior incerteza \citep{Elahi:2014:ALS:2542182.2542195}. 
+
+\subsection{Incerteza do Comitê}
+Estratégias baseadas na incerteza do modelo dependem fortemente da aptidão do modelo. Ou seja, caso o modelo escolhido não seja adequado aos dados, o erro do modelo se propagará à estratégia que, por sua vez, construirá o conjunto de treinamento de maneira enviesada, distorcendo ainda mais o modelo. Tendo esse ciclo desastroso em mente, desenvolveu-se uma medida de incerteza que considera vários modelos distintos para, assim, minimizar a possibilidade de se ter um modelo errado. 
+
+Os diversos modelos formam um \textit{comitê} onde cada um faz previsões para as instância não rotuladas de acordo com sua lógica. A partir de então, verifica-se, para cada instância, a discordância entre as previsões fornecidas pelo comitê. A instância de maior incerteza é aquela onde há maior discordância entre os modelos, enquanto que, em contrapartida, a de menor incerteza é aquela onde há maior concordância, sendo o ápice da ``certeza'' a unanimidade das previsões fornecidas pelo comitê \citep{Seung:1992:QC:130385.130417}. Este modo de se calcular a incerteza é conhecido como \textit{Incerteza do Comitê}.
+
+Quanto mais modelos tivermos no comitê, supostamente melhor será a construção do conjunto de treinamento. Entretanto, isto significa que os $n$ modelos devem ser treinados toda vez que se deseja selecionar uma instância para rotulagem, o que pode ser extremamente custoso. Uma solução para reduzir o tempo de treinamento seria treinar os $n$ modelos em paralelo, porém isto acarretaria em um alto custo de infraestrutura. Como alternativa viável, \citep{Elahi:2014:ALS:2542182.2542195} propôs um comitê formado não por modelos, mas por estratégia baseadas na incerteza do modelo e na incerteza da instância. Cada uma delas elege as instâncias de maior incerteza, conforme sua própria lógica. Ao final, as instâncias que receberam mais ``votos'' são escolhidas como sendo as que possuem maior incerteza global, por este motivo esta estratégia se chama \textit{votação}. É interessante notar que a votação diverge da ideia original de incerteza do comitê, escolhendo as instâncias com base na concordância ao invés da discordância.
+
+\subsection{Incerteza da Instância}
+O conceito de \textit{Incerteza da Instância} assume que a medida de incerteza deve ser calculada com base na instância apenas e não depender de nenhum modelo de previsão, afinal todo modelo se baseia em alguma suposição sobre os dados, que, por sua vez, pode ser enganosa. 
+
+Dentro do contexto relacionado a SR, a incerteza de uma instância pode ser dada através de alguma medida de dispersão, e.g., entropia ou variância. Uma vez que as instâncias são os itens do sistema que serão selecionados para serem avaliados por um usuário, é provável que tais itens já tenham recebido avaliações de outros usuários. Assim, a dispersão das avaliações pode ser considerada como medida de incerteza, que, em termos práticos, representa o nível de consenso que os usuários possuem sobre o item em questão (quanto maior a incerteza, menor o consenso). Obviamente, esta suposição, ou heurística, pode não se verificar na prática, acarretando na construção de um conjunto de treinamento enviesado.
+
+Um dos primeiros trabalhos a abordar \textit{Elicitação de Preferência para fins de Arranque Frio}, \citep{Rashid:2002:GKY:502716.502737} combina a entropia das avaliações recebidas por um item com sua popularidade, numa tentativa de combinar a dispersão do item como a probabilidade dele ser avaliado por um usuário qualquer. Em \citep{Rashid:2008:LPN:1540276.1540302} os autores investigam outras maneiras de se calcular a entropia de um item (e.g., utilizar o ganho da informação ao invés da entropia simples) e \citep{Golbandi:2010:BRS:1871437.1871734} combina a popularidade com a variância das avaliações.
+
+Outras abordagens incluem selecionar o item que possui maior similaridade com os demais \citep{Rashid:2006:MPD:1124772.1124915} e selecionar aqueles que, se avaliados, possibilitarão o refinamento do cálculo da similaridade entre os usuários, melhorando assim as previsões calculadas com base nas mesmas \citep{Mello:2010:ALD:1864708.1864782}. Infelizmente, ambas estratégias são especificas para técnicas de FC baseadas em Memória, o que as torna dependentes desse modelo.
+
+\subsection{Redução de Erro}
+Como mencionado anteriormente, estratégias baseadas na redução da incerteza supõem que, ao reduzir a incerteza no conjunto de treinamento, o erro do modelo necessariamente reduzirá. Esta suposição é enganosa, uma vez que o erro do modelo pode depender tanto do conjunto de treinamento quanto da aptidão do próprio. Tais estratégias combatem apenas o primeiro fator e negligenciam o segundo, portanto estratégias focadas em reduzir o erro do modelo como um todo foram desenvolvidas.
+
+Seja $Tr$ o conjunto de treinamento; $T$ o conjunto de testes; $\theta^{Tr}(x)$ a previsão para a instância $x$ dada pelo modelo treinado em $Tr$; e $u(x)$ a verdadeira classe da instância $x$. Uma das estratégias mais intuitivas, com base no redução do erro do modelo, é o valor esperado do erro do modelo \citep{RubensRecSysHB2010}. Nesta estratégia, cada instância não rotulada é inserida em $Tr$ como pertencendo a uma das possíveis $N_y$ classes. A partir de então, treina-se o modelo com $Tr \cup \langle x, y_i \rangle$ e verifica-se seu desempenho em $T$ através da uma métrica de avaliação $\Gamma$, como, por exemplo, MAE ou RMSE (ver seção \ref{sec:modelo-avaliacao}). Assumindo que $x$ possui a mesma probabilidade de pertencer a cada uma das classes $y_i$, a melhor instância a ser rotulada é $x'$ dada conforme a equação \ref{eq:red-erro-simple}.
+
+\begin{equation}
+x' = \argmin_x \frac{1}{N_y} \sum_{i=1}^{N_y} \sum_{x_a \in T} \Gamma \left[ u(x_a), \theta^{Tr \cup \langle x, y_i \rangle }(x_a) \right]
+\label{eq:red-erro-simple}
+\end{equation}
+
+Um dos problemas de se basear no erro fornecido pelo conjunto de testes é que a seleção da instância pode ficar demasiadamente condicionada ao conjunto em si, ou seja, estaríamos selecionando instâncias que favorecem a superespecialização do modelo. Como desejamos que o mesmo seja genérico o suficiente para ser utilizado com outros conjuntos de testes, uma melhor opção seria aplicar a mesma abordagem na validação cruzada (do conjunto de treinamento) e deixar o conjunto de testes apenas para verificação final. Seja $N_P$ o numero de partições de $Tr$, $P_k$ a partição utilizada para testes, logo, a partição utilizada para treinamento será $P_{Tr} = Tr \setminus P_k$. Desta maneira, $x'$ é dado através da equação \ref{eq:red-erro-vc}.
+
+\begin{equation}
+x' = \argmin_x \frac{1}{N_y N_P} \sum_{i=1}^{N_y} \sum_{k=1}^{N_P} \sum_{x_a \in P_k} \Gamma \left[ u(x_a), \theta^{P_{Tr} \cup \langle x, y_i \rangle }(x_a) \right]
+\label{eq:red-erro-vc}
+\end{equation}
+
+Uma estratégia baseada na redução do erro foi proposta em \citep{Golbandi:2010:BRS:1871437.1871734} para o problema do AF em SR. Neste trabalho, utiliza-se um modelo de recomendação para prever as preferências dos usuários em relação aos itens. De posse das mesmas, cada item é inserido no conjunto de treinamento como tendo recebido a avaliação prevista. O modelo é então treinado e avaliado no conjunto de testes através do RMSE e os itens a serem solicitados ao usuário são aqueles resultam no menor valor de RMSE. Esta estratégia foi batizada por \citep{Golbandi:2010:BRS:1871437.1871734} como \textit{estendimento guloso}, uma vez que ela é gulosa em relação ao RMSE, i.e., sempre busca o item que mais minimiza o RMSE no momento.
+
+Seguindo esta mesma linha, \citep{Golbandi:2011:ABR:1935826.1935910} propõe uma estratégia baseada na redução do erro utilizando uma árvore de decisão. Cada nó da árvore representa um item e, de acordo com a avaliação dada para o item em questão, o usuário é direcionado a avaliar outro item, seguindo um caminho na árvore até chegar a um nó folha. Ao contrário de árvores de decisão típicas, onde a hierarquia dos nós é dada pela entropia ou pelo ganho de informação, neste caso a hierarquia dos nós é definida pelo valor de RMSE associado ao item.
+
+O principal problema das estratégias baseadas na redução de erro é o esforço computacional de se calcular o erro associado a cada instância. Como \citep{Golbandi:2010:BRS:1871437.1871734} comenta, o estendimento guloso supera as demais estratégias em termos de acurácia, porém, em termos de tempo, ele é indiscutivelmente inferior as demais. Se o SR tiver um numero considerável de usuários e itens, treinar e avaliar o modelo de recomendação para descobrir o erro associado a cada item é uma tarefa extremamente árdua, podendo levar horas. Além disso, tais estratégias ficam extremamente condicionadas ao conjunto de testes o que pode levar a superespecialização do modelo.

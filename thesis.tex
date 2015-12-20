@@ -1,0 +1,98 @@
+\documentclass[msc,numbers]{coppe}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb, mathtools}
+\usepackage{hyperref}
+\usepackage{indentfirst}
+\usepackage{graphics}
+\usepackage{float}
+\usepackage{algpseudocode,algorithm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Declarações em Português do Pseudocódigo
+\algrenewcommand\algorithmicend{\textbf{fim}}
+\algrenewcommand\algorithmicdo{\textbf{faça}}
+\algrenewcommand\algorithmicwhile{\textbf{enquanto}}
+\algrenewcommand\algorithmicfor{\textbf{para}}
+\algrenewcommand\algorithmicforall{\textbf{para cada}}
+\algrenewcommand\algorithmicif{\textbf{se}}
+\algrenewcommand\algorithmicthen{\textbf{então}}
+\algrenewcommand\algorithmicelse{\textbf{senão}}
+\algrenewcommand\algorithmicreturn{\textbf{devolve}}
+\algrenewcommand\algorithmicfunction{\textbf{função}}
+\algrenewtext{EndWhile}{\algorithmicend\ \algorithmicwhile}
+\algrenewtext{EndFor}{\algorithmicend\ \algorithmicfor}
+\algrenewtext{EndIf}{\algorithmicend\ \algorithmicif}
+\algrenewtext{EndFunction}{\algorithmicend\ \algorithmicfunction}
+\algnewcommand\algorithmicto{\textbf{até}}
+\algrenewtext{For}[3]%
+{\algorithmicfor\ #1 $\gets$ #2 \algorithmicto\ #3 \algorithmicdo}
+\makeatletter
+\newcommand{\newalgname}[1]{%
+  \renewcommand{\ALG@name}{#1}%
+}
+\newalgname{Algoritmo}% All algorithms will be called "Algoritmo"
+\renewcommand{\listalgorithmname}{Lista de \ALG@name s}
+\makeatother
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\argmin}{\arg\!\min}
+\newcommand{\argmax}{\arg\!\max}
+\newcommand*\rfrac[2]{{}^{#1}\!/_{#2}}
+
+\makelosymbols
+\makeloabbreviations
+
+\begin{document}
+  \title{Aprendizado Ativo aplicado à Elicitação de Preferências para fins de Incentivo}
+  \foreigntitle{Active Learning applied to Rating Elicitation for Incentives Purposes}
+  \author{Marden Braga}{Pasinato}
+  \advisor{Prof.}{Geraldo Zimbrão da}{Silva}{D.Sc.}
+  %\advisor{Prof.}{Carlos Eduardo}{Ribeiro de Mello}{D.Eng.}
+  %\advisor{Prof.}{Nome do Terceiro Orientador}{Sobrenome}{D.Sc.}
+
+  \examiner{Prof.}{Geraldo Zimbrão da Silva}{D.Sc.}
+  \examiner{Prof.}{Geraldo Bonorino Xexéo}{D.Sc.}
+  \examiner{Prof.}{Leandro Guimarães Marques Alvim}{D.Sc.}
+  \examiner{Prof.}{Carlos Eduardo Ribeiro de Mello}{D.Sc.}
+  %\examiner{Prof.}{Nome do Quarto Examinador Sobrenome}{Ph.D.}
+  %\examiner{Prof.}{Nome do Quinto Examinador Sobrenome}{Ph.D.}
+  \department{PESC}
+  \date{11}{2014}
+
+  \keyword{Sistemas de Recomendação}
+  \keyword{Aprendizado Ativo}
+  \keyword{Elicitação de Preferências}
+  
+  %\abbrev{SR}{Sistema de Recomendação}
+  %\abbrev{AM}{Aprendizado de Máquina}
+  %\abbrev{AA}{Aprendizado Ativo}
+
+  \maketitle
+
+  \frontmatter
+  \include{dedic}
+  \include{thanks}
+  \include{resumo}
+  \include{abstract}
+  \tableofcontents
+  \listoffigures
+  \listoftables
+  \listofalgorithms
+  \addcontentsline{toc}{chapter}{\listalgorithmname}
+  \printlosymbols
+  \printloabbreviations
+  %\addcontentsline{toc}{chapter}{\listabbreviationname}
+
+  \mainmatter
+  \include{chap01}
+  \include{chap02}
+  \include{chap03}
+  \include{chap04}
+  \include{chap05}
+  \include{chap06}
+
+  \backmatter
+  \bibliographystyle{coppe-unsrt}
+  \bibliography{thesis-real}
+
+  %\appendix
+  %\include{appenA}
+\end{document}
