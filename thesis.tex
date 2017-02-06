@@ -7,6 +7,12 @@
 \usepackage{float}
 \usepackage{algpseudocode,algorithm}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Modificado por Geraldo Xexéo
+% para permitir entender melhor as citações
+%% Bibliografia
+\usepackage{natbib}
+\setcitestyle{authoryear,open={(},close={)}}
+\bibliographystyle{coppe-plain}
 % Declarações em Português do Pseudocódigo
 \algrenewcommand\algorithmicend{\textbf{fim}}
 \algrenewcommand\algorithmicdo{\textbf{faça}}
@@ -89,6 +95,7 @@
   \include{chap06}
 
   \backmatter
+  \bibliographystyle{thesis-real}
   \bibliographystyle{coppe-unsrt}
   \bibliography{thesis-real}
 
