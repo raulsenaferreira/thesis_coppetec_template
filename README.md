@@ -17,6 +17,8 @@ of contents, and list of bibliographic references.
 Although it is tied to the COPPE/UFRJ guidelines, it can be easily ported to
 standards of other institutions.
 
+###Observation
+The citation style suffered a changing, number format to author/year. Instead of to use \cite{} you should use \citep{}
 
 ###When Conceived
 
